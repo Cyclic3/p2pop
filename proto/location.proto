@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "base.proto";
+import "options.proto";
+
+package p2pop.proto;
+
+message Location {
+  // Luids from 0 to 2^32 are reserved
+  uint64 luid = 1;
+  bytes data = 2;
+}

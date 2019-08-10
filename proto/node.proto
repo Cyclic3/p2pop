@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "base.proto";
+import "options.proto";
+
+package p2pop.proto;
+
+message PingRequest {}
+message PingResponse {}
+
+message ContactRequest {
+  Nuid me = 1;
+}
+message ContactResponse {
+  Nuid me = 1;
+}
+
+message CheckSupportRequest {
+  uint64 puid = 1;
+}
+message CheckSupportResponse {
+  bool supported = 1;
+}
+
+message GetPubkeyRequest {}
+message GetPubkeyResponse {
+  bytes pem = 1;
+}
+
+// Common interface to all nodes
+service Node {
+  option (p2pop_puid) = 0xe47f96abfbab0991;
+  rpc ping(PingRequest) returns (PingResponse);
+  rpc check_support(CheckSupportRequest) returns (CheckSupportResponse);
+  rpc contact(ContactRequest) returns (ContactResponse);
+  rpc get_pubkey(GetPubkeyRequest) returns (GetPubkeyResponse);
+}

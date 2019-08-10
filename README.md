@@ -13,12 +13,11 @@ We use blake2s-160 as our hash function, and as such most tokens are 20 bytes
 (160 bits) in size.
 
 ## How?
-p2pop uses capnproto for messages, a low-overhead protocol buffers library,
+p2pop uses protobuf for messages, a low-overhead protocol buffers library,
 but not its inbuilt RPC, which requires a TCP stream. However, due to the
-flexibility of capnp, the same syntax can be used (_TODO: check this_).
+flexibility of protobuf, the same syntax can be used.
 
-Instead, we use a 160-bit uid (called PUIDs, and are most definitely not UUIDs)
-to uniquely identify your protocol.
+Instead, we use a 64-bit uid to uniquely identify your protocol.
 
 Each node is also assigned a 160-bit uid (called a NUID, also not a UUID) to
 identify it. This can be a hash of a public signing key, or just a randomly
@@ -36,4 +35,12 @@ with the message.
 Please generate a random PUID to avoid collisions. No-one cares if you embed
 your name into the PUID, as it will not be seen outside of your code.
 
+## RPC description
+Use the protobuf service/rpc syntax as normal, but be aware that the RPC's
+index is the only thing used to distinguish it, so reordering, insertation
+and deletion will break backwards-compatiblity.
 
+## Code style
+I use pointers to signify non-owning or copying references. If a constructor
+takes a pointer to an object, that object must survive until the object is
+moved into, or destroyed.

@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import "base.proto";
+
+package p2pop.proto;
+
+message Status {
+  int32 error_code = 1;
+  string msg = 2;
+}
+
+message Call {
+}
+
+message Return {
+  Status status = 1;
+}
+
+message Packet {
+  Nuid source = 1;
+  Nuid dest = 2;
+  uint64 puid = 3;
+  uint32 mid = 6;
+  uint64 cid = 4;
+  bytes params = 5;
+  oneof type {
+    Call call = 7;
+    Return return = 8;
+  }
+}

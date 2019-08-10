@@ -1,0 +1,78 @@
+@namespace p2pop.modules
+
+using p2pop = import "modules.capnp";
+using BER = Data;
+
+enum AgreeAlg {
+  X25519;
+}
+
+enum AuthAlg {
+  Ed25519;
+}
+
+enum PrivacyAlg {
+  AES256;
+}
+
+# All encoding is BER unless otherwise specified
+#
+# Whilst capnp provides a similar idea, a slot allows us to not reparse the
+# BER each call we make, and allows for easier management.
+# Slots cannot be directly read; the only interaction provided is use in
+# authenticating and encrypting. They store private keys.
+#
+# Slots are not shared, and a node MUST provide AT LEAST 8 slots.
+#
+# All calls command the remote node to do something. One side can be fully
+# encrypted whilst the other is insecure.
+#
+# There should be no indication of how many encrypted layers there are
+
+interface Crypto {
+  # Parameter checks
+  rpc getAgreeAlgs() -> (algs : AgreeAlg[]);
+  rpc getAuthAlgs() -> (algs : AuthAlg[]);
+  rpc getPrivacyAlgs() -> (algs : PrivacyAlg[]);
+  rpc getMaxSlots() -> (slots : uint16);
+
+  rpc getMasterAuth() -> (pubkey : BER);
+
+  rpc wrapAuth(slot : UInt16) -> ();
+  rpc wrapPrivacy(slot : UInt16) -> ();
+  rpc unwrap() -> ();
+
+  # Slot modification
+  rpc setSlot(slot : uint16, value : Data) -> ();
+  rpc offerAgree(pubkey : BER, slot : uint16) -> ();
+  rpc acceptAgree(pubkey : BER, slot : uint16) -> ();
+}
+interface Crypto {
+  # Parameter checks
+  getAgreeAlgs @0 () -> (algs : AgreeAlg[]);
+  getAuthAlgs @1 () -> (algs : AuthAlg[]);
+  getSecurityAlgs @2 () -> (algs : SecurityAlg[]);
+  getMaxSlots @3 () -> (slots : uint16);
+  getMasterAuth @4 () -> (pubkey : BER);
+
+  # Security flags: will change how messages are communicated between nodes
+  authMessages @5 (slot : uint16) -> ();
+  secureMessages @6 (slot : uint16) -> ();
+}
+
+struct PrivateLayer {
+  ciphertext @0 : Data;
+}
+
+struct AuthenticatedLayer {
+  payload @0 : Data;
+  auth @1 : BER;
+}
+
+# Any failed message MUST be ignored
+struct CryptoLayer {
+  union {
+    private @0 : PrivateLayer;
+    auth @1 : AuthenticatedLayer;
+  }
+}

@@ -1,0 +1,40 @@
+#include "p2pop/crypto.hpp"
+
+#include <botan/pubkey.h>
+#include <botan/ber_dec.h>
+
+namespace p2pop::crypto {
+  class botan_verifier : public Verifier {
+  public:
+    std::unique_ptr<Botan::Public_Key> pub;
+
+  public:
+    /// Verifies a ber signature
+    bool verify(data_const_ref ber_signature) const override {
+    }
+    /// BER pubkey
+    std::string pubkey() const override {
+
+    }
+
+  public:
+    botan_verifier(data_const_ref ber) {
+      Botan::pk
+    }
+  };
+
+  class botan_signer : public Verifier {
+    /// BER signature
+    std::string sign(data_const_ref) const;
+    /// BER privkey
+    std::string privkey() const;
+  };
+
+  std::unique_ptr<Verifier> Verifier::load(data_const_ref ber) {
+    return std::make_unique<botan_verifier>(ber);
+  }
+
+  std::unique_ptr<Signer> Signer::load(data_const_ref ber) {
+    return std::make_unique<botan_signer>(ber);
+  }
+}

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+import "options.proto";
+
+package p2pop.proto;
+
+message Nuid {
+  // MUST be 20 bytes long
+  bytes value = 1;
+}
